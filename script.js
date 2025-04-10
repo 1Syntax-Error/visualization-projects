@@ -1,7 +1,7 @@
 // Main visualization code for Premier League Player Statistics
 document.addEventListener('DOMContentLoaded', function() {
     // Dataset URL (direct link to raw file)
-    const datasetUrl = 'https://raw.githubusercontent.com/1Syntax-Error/visualization-projects/refs/heads/main/dataset%20-%202020-09-24.csv';
+    const datasetUrl = 'https://raw.githubusercontent.com/1Syntax-Error/visualization-projects/main/dataset%20-%202020-09-24.csv';
     
     // Load and process the data
     loadData(datasetUrl);
@@ -146,18 +146,22 @@ document.addEventListener('DOMContentLoaded', function() {
             .attr("transform", `translate(${margin.left},${margin.top})`);
         
         // Find min and max values for the scales
-        const xMin = d3.min(data, d => d[xMetric]) * 0.9; // Add 10% padding
-        const xMax = d3.max(data, d => d[xMetric]) * 1.1;
-        const yMin = d3.min(data, d => d[yMetric]) * 0.9; // Add 10% padding
-        const yMax = d3.max(data, d => d[yMetric]) * 1.1;
+        const xMin = d3.min(data, d => d[xMetric]) || 0;
+        const xMax = d3.max(data, d => d[xMetric]) || 0;
+        const yMin = d3.min(data, d => d[yMetric]) || 0;
+        const yMax = d3.max(data, d => d[yMetric]) || 0;
+        
+        // Calculate padding (5% of the data range or at least 1 unit)
+        const xPadding = Math.max(1, (xMax - xMin) * 0.05);
+        const yPadding = Math.max(1, (yMax - yMin) * 0.05);
         
         // Create scales with padding to keep points off the axes
         const xScale = d3.scaleLinear()
-            .domain([Math.max(0, xMin), xMax])
+            .domain([Math.max(0, xMin - xPadding), xMax + xPadding])
             .range([0, width]);
         
         const yScale = d3.scaleLinear()
-            .domain([Math.max(0, yMin), yMax])
+            .domain([Math.max(0, yMin - yPadding), yMax + yPadding])
             .range([height, 0]);
         
         const radiusScale = d3.scaleSqrt()
