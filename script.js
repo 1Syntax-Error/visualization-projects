@@ -1,264 +1,369 @@
-/**
- * Premier League Player Statistics Visualization
- * Main JavaScript file for the design demonstrations
- */
-
-// Wait for DOM to be fully loaded
+// Main visualization code for Premier League Player Statistics
 document.addEventListener('DOMContentLoaded', function() {
-    // Sample data for demonstrations
-    const samplePlayers = [
-        {Name: "Harry Kane", Position: "Forward", Club: "Tottenham Hotspur", Goals: 21, Assists: 14, Appearances: 35},
-        {Name: "Mohamed Salah", Position: "Forward", Club: "Liverpool", Goals: 19, Assists: 10, Appearances: 37},
-        {Name: "Bruno Fernandes", Position: "Midfielder", Club: "Manchester United", Goals: 18, Assists: 12, Appearances: 37},
-        {Name: "Son Heung-min", Position: "Forward", Club: "Tottenham Hotspur", Goals: 17, Assists: 10, Appearances: 37},
-        {Name: "Patrick Bamford", Position: "Forward", Club: "Leeds United", Goals: 17, Assists: 7, Appearances: 38},
-        {Name: "Dominic Calvert-Lewin", Position: "Forward", Club: "Everton", Goals: 16, Assists: 1, Appearances: 33},
-        {Name: "Jamie Vardy", Position: "Forward", Club: "Leicester City", Goals: 15, Assists: 9, Appearances: 34},
-        {Name: "Ilkay Gündogan", Position: "Midfielder", Club: "Manchester City", Goals: 13, Assists: 2, Appearances: 28},
-        {Name: "Ollie Watkins", Position: "Forward", Club: "Aston Villa", Goals: 14, Assists: 5, Appearances: 37},
-        {Name: "Alexandre Lacazette", Position: "Forward", Club: "Arsenal", Goals: 13, Assists: 2, Appearances: 31},
-        {Name: "Marcus Rashford", Position: "Forward", Club: "Manchester United", Goals: 11, Assists: 9, Appearances: 37},
-        {Name: "Raheem Sterling", Position: "Forward", Club: "Manchester City", Goals: 10, Assists: 7, Appearances: 31},
-        {Name: "Callum Wilson", Position: "Forward", Club: "Newcastle United", Goals: 12, Assists: 5, Appearances: 26},
-        {Name: "Sadio Mané", Position: "Forward", Club: "Liverpool", Goals: 11, Assists: 7, Appearances: 35},
-        {Name: "Danny Ings", Position: "Forward", Club: "Southampton", Goals: 12, Assists: 4, Appearances: 29},
-        {Name: "Phil Foden", Position: "Midfielder", Club: "Manchester City", Goals: 9, Assists: 5, Appearances: 28},
-        {Name: "Wilfried Zaha", Position: "Forward", Club: "Crystal Palace", Goals: 11, Assists: 2, Appearances: 30},
-        {Name: "Kevin De Bruyne", Position: "Midfielder", Club: "Manchester City", Goals: 6, Assists: 12, Appearances: 25},
-        {Name: "Mason Mount", Position: "Midfielder", Club: "Chelsea", Goals: 6, Assists: 5, Appearances: 36},
-        {Name: "Jack Grealish", Position: "Midfielder", Club: "Aston Villa", Goals: 6, Assists: 10, Appearances: 26}
-    ];
-
-    // Goalkeeper sample data
-    const goalkeepers = [
-        {Name: "Ederson", Position: "Goalkeeper", Club: "Manchester City", Clean_sheets: 19, Saves: 66, Appearances: 36},
-        {Name: "Emiliano Martínez", Position: "Goalkeeper", Club: "Aston Villa", Clean_sheets: 15, Saves: 142, Appearances: 38},
-        {Name: "Edouard Mendy", Position: "Goalkeeper", Club: "Chelsea", Clean_sheets: 16, Saves: 66, Appearances: 31},
-        {Name: "Kasper Schmeichel", Position: "Goalkeeper", Club: "Leicester City", Clean_sheets: 11, Saves: 98, Appearances: 38},
-        {Name: "Illan Meslier", Position: "Goalkeeper", Club: "Leeds United", Clean_sheets: 11, Saves: 140, Appearances: 35}
-    ];
-
-    // Defender sample data
-    const defenders = [
-        {Name: "Ruben Dias", Position: "Defender", Club: "Manchester City", Clean_sheets: 15, Tackles: 59, Interceptions: 31, Appearances: 32},
-        {Name: "Harry Maguire", Position: "Defender", Club: "Manchester United", Clean_sheets: 13, Tackles: 28, Interceptions: 58, Appearances: 34},
-        {Name: "John Stones", Position: "Defender", Club: "Manchester City", Clean_sheets: 14, Tackles: 22, Interceptions: 24, Appearances: 22},
-        {Name: "Luke Shaw", Position: "Defender", Club: "Manchester United", Clean_sheets: 10, Tackles: 62, Interceptions: 37, Appearances: 32},
-        {Name: "Aaron Wan-Bissaka", Position: "Defender", Club: "Manchester United", Clean_sheets: 13, Tackles: 88, Interceptions: 50, Appearances: 34}
-    ];
-
-    // Initialize visualizations if containers exist
-    if (document.getElementById('scatter-plot-container')) {
-        createScatterPlot(samplePlayers);
-    }
-
-    /**
-     * Creates a scatter plot visualization
-     * @param {Array} data - Array of player objects
-     */
-    function createScatterPlot(data) {
-        // Set up dimensions and margins
-        const margin = {top: 20, right: 30, bottom: 40, left: 50};
-        const width = 700 - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
-
-        // Remove any existing SVG
-        d3.select("#scatter-plot-container svg").remove();
-
-        // Create SVG
-        const svg = d3.select("#scatter-plot-container")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
-
-        // Define scales
-        const xScale = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.Goals) * 1.1])
-            .range([0, width]);
-
-        const yScale = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.Assists) * 1.1])
-            .range([height, 0]);
-
-        const radiusScale = d3.scaleSqrt()
-            .domain([0, d3.max(data, d => d.Appearances)])
-            .range([3, 15]);
-
-        const colorScale = d3.scaleOrdinal()
-            .domain(["Forward", "Midfielder", "Defender", "Goalkeeper"])
-            .range(["#e90052", "#04f5ff", "#00ff85", "#ff9e00"]);
-
-        // Create tooltip
-        const tooltip = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-
-        // Create X axis
-        svg.append("g")
-            .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(xScale));
-
-        // X axis label
-        svg.append("text")
-            .attr("text-anchor", "middle")
-            .attr("x", width / 2)
-            .attr("y", height + margin.bottom - 5)
-            .text("Goals");
-
-        // Create Y axis
-        svg.append("g")
-            .call(d3.axisLeft(yScale));
-
-        // Y axis label
-        svg.append("text")
-            .attr("text-anchor", "middle")
-            .attr("transform", "rotate(-90)")
-            .attr("x", -height / 2)
-            .attr("y", -margin.left + 15)
-            .text("Assists");
-
-        // Add dots
-        svg.selectAll("circle")
-            .data(data)
-            .enter()
-            .append("circle")
-            .attr("cx", d => xScale(d.Goals))
-            .attr("cy", d => yScale(d.Assists))
-            .attr("r", d => radiusScale(d.Appearances))
-            .style("fill", d => colorScale(d.Position))
-            .style("opacity", 0.7)
-            .style("stroke", "white")
-            .on("mouseover", function(event, d) {
-                d3.select(this)
-                    .style("stroke", "black")
-                    .style("opacity", 1);
-                
-                tooltip.transition()
-                    .duration(200)
-                    .style("opacity", .9);
-                    
-                tooltip.html(`<strong>${d.Name}</strong><br>` +
-                             `${d.Club}<br>` +
-                             `Goals: ${d.Goals}<br>` +
-                             `Assists: ${d.Assists}<br>` +
-                             `Appearances: ${d.Appearances}`)
-                    .style("left", (event.pageX + 10) + "px")
-                    .style("top", (event.pageY - 28) + "px");
-            })
-            .on("mouseout", function() {
-                d3.select(this)
-                    .style("stroke", "white")
-                    .style("opacity", 0.7);
-                    
-                tooltip.transition()
-                    .duration(500)
-                    .style("opacity", 0);
+    // Dataset URL (direct link to raw file)
+    const datasetUrl = 'https://raw.githubusercontent.com/1Syntax-Error/visualization-projects/refs/heads/main/dataset%20-%202020-09-24.csv';
+    
+    // Load and process the data
+    loadData(datasetUrl);
+    
+    async function loadData(url) {
+        try {
+            const response = await fetch(url);
+            const csvText = await response.text();
+            
+            // Parse CSV
+            Papa.parse(csvText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    const data = results.data;
+                    processData(data);
+                },
+                error: function(error) {
+                    console.error("Error parsing CSV:", error);
+                }
             });
-
-        // Add legend
-        const legend = svg.append("g")
-            .attr("class", "legend")
-            .attr("transform", `translate(${width - 100}, 20)`);
-
-        const positions = ["Forward", "Midfielder", "Defender", "Goalkeeper"];
-
-        positions.forEach((position, i) => {
-            legend.append("circle")
-                .attr("cx", 0)
-                .attr("cy", i * 20)
-                .attr("r", 6)
-                .style("fill", colorScale(position));
-
-            legend.append("text")
-                .attr("x", 10)
-                .attr("y", i * 20 + 5)
-                .text(position)
-                .style("font-size", "12px");
-        });
-
-        // Add size legend
-        const sizeLegend = svg.append("g")
-            .attr("transform", `translate(20, 20)`);
-
-        sizeLegend.append("text")
-            .attr("x", 0)
-            .attr("y", 0)
-            .text("Circle size: Appearances")
-            .style("font-size", "12px");
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
     }
-
-    /**
-     * Creates a radar chart visualization (not implemented in this demo)
-     * Placeholder for Design 2 implementation
-     */
-    function createRadarChart(selector, players, position) {
-        // This would be implemented for Design 2
-        console.log("Radar chart would be created here");
-    }
-
-    /**
-     * Creates a heat map visualization (not implemented in this demo)
-     * Placeholder for Design 3 implementation
-     */
-    function createHeatMap(selector, players) {
-        // This would be implemented for Design 3
-        console.log("Heat map would be created here");
-    }
-
-    /**
-     * Creates a bar chart visualization (not implemented in this demo)
-     * Placeholder for Design 4 (bad design) implementation
-     */
-    function createBarChart(selector, data, metric) {
-        // This would be implemented for Design 4
-        console.log("Bar chart would be created here");
-    }
-
-    /**
-     * Utility function to process player data
-     * Converts percentage strings to numbers, handles missing values, etc.
-     * @param {Array} data - Raw player data array
-     * @return {Object} Processed data object
-     */
-    function processPlayerData(data) {
-        // Convert percentage strings to numbers
-        data.forEach(player => {
+    
+    function processData(rawData) {
+        // Clean and process the data
+        const data = rawData.map(player => {
+            // Convert percentage strings to numbers
             Object.keys(player).forEach(key => {
                 if (typeof player[key] === 'string' && player[key].includes('%')) {
                     player[key] = parseFloat(player[key].replace('%', ''));
                 }
             });
+            return player;
         });
-
-        // Calculate position averages
-        const positions = ["Forward", "Midfielder", "Defender", "Goalkeeper"];
-        const positionAverages = {};
-
+        
+        // Initialize the visualization
+        setupControls(data);
+        createVisualization(data);
+    }
+    
+    function setupControls(data) {
+        // Get all positions
+        const positions = [...new Set(data.map(d => d.Position))].filter(Boolean);
+        
+        // Create position checkboxes
+        const positionCheckboxes = document.getElementById('position-checkboxes');
         positions.forEach(position => {
-            const playersInPosition = data.filter(p => p.Position === position);
-            positionAverages[position] = {};
+            const label = document.createElement('label');
+            label.style.marginRight = '10px';
             
-            // Calculate average for metrics
-            const metrics = Object.keys(playersInPosition[0]).filter(key => 
-                typeof playersInPosition[0][key] === 'number' && 
-                !isNaN(playersInPosition[0][key])
-            );
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = position;
+            checkbox.checked = true;
+            checkbox.id = `pos-${position.toLowerCase()}`;
+            checkbox.addEventListener('change', () => updateVisualization(data));
             
-            metrics.forEach(metric => {
-                const values = playersInPosition.map(p => p[metric]).filter(v => !isNaN(v));
-                if (values.length > 0) {
-                    positionAverages[position][metric] = values.reduce((a, b) => a + b, 0) / values.length;
-                } else {
-                    positionAverages[position][metric] = 0;
-                }
-            });
+            const span = document.createElement('span');
+            span.textContent = position;
+            
+            const marker = document.createElement('span');
+            marker.className = `position-marker position-${position.toLowerCase()}`;
+            
+            label.appendChild(checkbox);
+            label.appendChild(marker);
+            label.appendChild(span);
+            positionCheckboxes.appendChild(label);
         });
-
-        return {
-            players: data,
-            positionAverages
-        };
+        
+        // Get all clubs
+        const clubs = [...new Set(data.map(d => d.Club))].filter(Boolean).sort();
+        
+        // Create club filter dropdown
+        const clubFilter = document.getElementById('club-filter');
+        clubs.forEach(club => {
+            const option = document.createElement('option');
+            option.value = club;
+            option.textContent = club;
+            clubFilter.appendChild(option);
+        });
+        
+        // Add event listeners to the controls
+        document.getElementById('x-metric').addEventListener('change', () => updateVisualization(data));
+        document.getElementById('y-metric').addEventListener('change', () => updateVisualization(data));
+        document.getElementById('size-metric').addEventListener('change', () => updateVisualization(data));
+        document.getElementById('club-filter').addEventListener('change', () => updateVisualization(data));
+        document.getElementById('min-appearances').addEventListener('input', () => updateVisualization(data));
+    }
+    
+    function createVisualization(data) {
+        // Initial visualization with default settings
+        updateVisualization(data);
+    }
+    
+    function updateVisualization(data) {
+        // Get selected metrics and filters
+        const xMetric = document.getElementById('x-metric').value;
+        const yMetric = document.getElementById('y-metric').value;
+        const sizeMetric = document.getElementById('size-metric').value;
+        const clubFilter = document.getElementById('club-filter').value;
+        const minAppearances = parseInt(document.getElementById('min-appearances').value) || 0;
+        
+        // Get selected positions
+        const selectedPositions = Array.from(document.querySelectorAll('#position-checkboxes input:checked')).map(cb => cb.value);
+        
+        // Filter data based on selections
+        let filteredData = data.filter(player => {
+            return selectedPositions.includes(player.Position) && 
+                   (clubFilter === 'All' || player.Club === clubFilter) &&
+                   player.Appearances >= minAppearances &&
+                   player[xMetric] !== null && player[xMetric] !== undefined &&
+                   player[yMetric] !== null && player[yMetric] !== undefined &&
+                   player[sizeMetric] !== null && player[sizeMetric] !== undefined;
+        });
+        
+        // Create scatter plot
+        createScatterPlot(filteredData, xMetric, yMetric, sizeMetric);
+        
+        // Update position statistics
+        updatePositionStats(filteredData, xMetric, yMetric);
+    }
+    
+    function createScatterPlot(data, xMetric, yMetric, sizeMetric) {
+        // Clear previous visualization
+        d3.select("#scatter-plot").html("");
+        
+        // Set up dimensions and margins
+        const margin = {top: 40, right: 120, bottom: 60, left: 80};
+        const width = document.getElementById('scatter-plot').clientWidth - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
+        
+        // Create SVG
+        const svg = d3.select("#scatter-plot")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+        
+        // Find min and max values for the scales
+        const xMin = d3.min(data, d => d[xMetric]) * 0.9; // Add 10% padding
+        const xMax = d3.max(data, d => d[xMetric]) * 1.1;
+        const yMin = d3.min(data, d => d[yMetric]) * 0.9; // Add 10% padding
+        const yMax = d3.max(data, d => d[yMetric]) * 1.1;
+        
+        // Create scales with padding to keep points off the axes
+        const xScale = d3.scaleLinear()
+            .domain([Math.max(0, xMin), xMax])
+            .range([0, width]);
+        
+        const yScale = d3.scaleLinear()
+            .domain([Math.max(0, yMin), yMax])
+            .range([height, 0]);
+        
+        const radiusScale = d3.scaleSqrt()
+            .domain([0, d3.max(data, d => d[sizeMetric])])
+            .range([3, 15]);
+        
+        const colorScale = d3.scaleOrdinal()
+            .domain(["Forward", "Midfielder", "Defender", "Goalkeeper"])
+            .range(["#e90052", "#04f5ff", "#00ff85", "#ff9e00"]);
+        
+        // Create axes
+        svg.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(xScale))
+            .append("text")
+            .attr("x", width / 2)
+            .attr("y", 40)
+            .attr("fill", "black")
+            .style("text-anchor", "middle")
+            .style("font-size", "14px")
+            .text(xMetric);
+        
+        svg.append("g")
+            .call(d3.axisLeft(yScale))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", -60)
+            .attr("x", -height / 2)
+            .attr("fill", "black")
+            .style("text-anchor", "middle")
+            .style("font-size", "14px")
+            .text(yMetric);
+        
+        // Add tooltip
+        const tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+        
+        // Add dots
+        svg.selectAll("circle")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("cx", d => xScale(d[xMetric]))
+            .attr("cy", d => yScale(d[yMetric]))
+            .attr("r", d => radiusScale(d[sizeMetric]))
+            .style("fill", d => colorScale(d.Position))
+            .style("opacity", 0.7)
+            .style("stroke", "white")
+            .on("mouseover", function(event, d) {
+                d3.select(this)
+                    .style("stroke", "#000")
+                    .style("opacity", 1);
+                
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                
+                tooltip.html(`
+                    <strong>${d.Name}</strong><br>
+                    ${d.Club}<br>
+                    Position: ${d.Position}<br>
+                    ${xMetric}: ${d[xMetric]}<br>
+                    ${yMetric}: ${d[yMetric]}<br>
+                    ${sizeMetric}: ${d[sizeMetric]}<br>
+                    Appearances: ${d.Appearances}
+                `)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+            })
+            .on("mouseout", function() {
+                d3.select(this)
+                    .style("stroke", "white")
+                    .style("opacity", 0.7);
+                
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            })
+            .on("click", function(event, d) {
+                // Update player stats panel
+                updatePlayerStats(d);
+                
+                // Highlight the selected player
+                svg.selectAll("circle")
+                    .style("stroke-width", 1);
+                
+                d3.select(this)
+                    .style("stroke", "#000")
+                    .style("stroke-width", 2);
+            });
+        
+        // Add legend - positioned within the plot area
+        const legendX = width - 100; // Position the legend inside the plot area
+        const legendY = 20;
+        
+        const legend = svg.append("g")
+            .attr("transform", `translate(${legendX}, ${legendY})`);
+        
+        const positions = ["Forward", "Midfielder", "Defender", "Goalkeeper"];
+        
+        // Create a background rectangle for the legend
+        legend.append("rect")
+            .attr("width", 120)
+            .attr("height", positions.length * 25 + 60) // Height based on number of items + size legend
+            .attr("fill", "white")
+            .attr("stroke", "#ddd")
+            .attr("rx", 5) // Rounded corners
+            .attr("ry", 5);
+        
+        positions.forEach((position, i) => {
+            const g = legend.append("g")
+                .attr("transform", `translate(10, ${i * 25 + 15})`);
+            
+            g.append("circle")
+                .attr("r", 6)
+                .style("fill", colorScale(position));
+            
+            g.append("text")
+                .attr("x", 15)
+                .attr("y", 5)
+                .text(position)
+                .style("font-size", "12px");
+        });
+        
+        // Add size legend
+        const sizeLegend = legend.append("g")
+            .attr("transform", `translate(10, ${positions.length * 25 + 15})`);
+        
+        sizeLegend.append("text")
+            .attr("y", 0)
+            .text(`Circle size: ${sizeMetric}`)
+            .style("font-size", "12px");
+    }
+    
+    function updatePositionStats(data, xMetric, yMetric) {
+        const positions = [...new Set(data.map(d => d.Position))];
+        const positionStats = document.getElementById('position-stats');
+        positionStats.innerHTML = '';
+        
+        positions.forEach(position => {
+            const playersInPosition = data.filter(d => d.Position === position);
+            
+            if (playersInPosition.length > 0) {
+                // Calculate metrics for this position
+                const xAvg = d3.mean(playersInPosition, d => d[xMetric]);
+                const yAvg = d3.mean(playersInPosition, d => d[yMetric]);
+                
+                const listItem = document.createElement('li');
+                const marker = document.createElement('span');
+                marker.className = `position-marker position-${position.toLowerCase()}`;
+                
+                listItem.appendChild(marker);
+                listItem.innerHTML += `
+                    <strong>${position}</strong> (${playersInPosition.length} players)<br>
+                    Avg ${xMetric}: ${xAvg?.toFixed(2) || 'N/A'}<br>
+                    Avg ${yMetric}: ${yAvg?.toFixed(2) || 'N/A'}
+                `;
+                positionStats.appendChild(listItem);
+                
+                // Add a small spacing between position stats
+                const spacer = document.createElement('li');
+                spacer.style.height = '10px';
+                positionStats.appendChild(spacer);
+            }
+        });
+    }
+    
+    function updatePlayerStats(player) {
+        const statsPanel = document.getElementById('selected-player-stats');
+        
+        // Create a list of all non-null stats for this player
+        const stats = Object.keys(player)
+            .filter(key => player[key] !== null && player[key] !== undefined && 
+                         typeof player[key] !== 'object' && key !== 'Name')
+            .map(key => {
+                let value = player[key];
+                if (typeof value === 'number' && !Number.isInteger(value)) {
+                    value = value.toFixed(2);
+                }
+                return { key, value };
+            });
+        
+        // Create the HTML for the stats panel
+        let html = `
+            <h4>${player.Name}</h4>
+            <p>${player.Club} | ${player.Position} | ${player.Nationality}</p>
+            <div style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="text-align: left; padding: 5px; border-bottom: 1px solid #ddd;">Stat</th>
+                        <th style="text-align: right; padding: 5px; border-bottom: 1px solid #ddd;">Value</th>
+                    </tr>
+        `;
+        
+        stats.forEach(stat => {
+            html += `
+                <tr>
+                    <td style="text-align: left; padding: 5px; border-bottom: 1px solid #eee;">${stat.key}</td>
+                    <td style="text-align: right; padding: 5px; border-bottom: 1px solid #eee;">${stat.value}</td>
+                </tr>
+            `;
+        });
+        
+        html += `</table></div>`;
+        
+        statsPanel.innerHTML = html;
     }
 });

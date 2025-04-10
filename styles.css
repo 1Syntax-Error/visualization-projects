@@ -1,18 +1,6 @@
-/* Premier League Player Statistics Visualization Styles */
+/* Simple CSS for Premier League Visualization */
 
-:root {
-    --primary-color: #37003c; /* Premier League purple */
-    --secondary-color: #00ff85; /* Premier League green */
-    --text-color: #333;
-    --bg-color: #f8f8f8;
-    --card-bg: #fff;
-    --accent-color: #e90052; /* Premier League pink */
-    --position-forward: #e90052;
-    --position-midfielder: #04f5ff;
-    --position-defender: #00ff85;
-    --position-goalkeeper: #ff9e00;
-}
-
+/* Basic styles */
 * {
     margin: 0;
     padding: 0;
@@ -20,29 +8,11 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif;
     line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--bg-color);
+    color: #333;
+    background-color: #f8f8f8;
     padding: 20px;
-}
-
-header {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-h1, h2, h3, h4, h5, h6 {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-header h1, header h2 {
-    color: white;
 }
 
 .container {
@@ -50,202 +20,115 @@ header h1, header h2 {
     margin: 0 auto;
 }
 
-/* Table of Contents */
-.toc {
-    background-color: var(--card-bg);
-    padding: 2rem;
-    margin-bottom: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.toc h2 {
-    border-bottom: 2px solid var(--secondary-color);
-    padding-bottom: 0.5rem;
-}
-
-.toc ul {
-    list-style-type: none;
-    padding-left: 1rem;
-}
-
-.toc li {
-    margin-bottom: 0.5rem;
-    padding: 0.5rem;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-}
-
-.toc li:hover {
-    background-color: rgba(0, 255, 133, 0.1);
-}
-
-.toc a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-    display: block;
-}
-
-.toc a:hover {
-    color: var(--accent-color);
-}
-
-/* Design Sections */
-.design-section {
-    background-color: var(--card-bg);
-    padding: 2rem;
-    margin-bottom: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.design-section h2 {
-    border-bottom: 2px solid var(--secondary-color);
-    padding-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-}
-
-.good-tag, .bad-tag {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    margin-left: 1rem;
+/* Header */
+header {
+    background-color: #37003c; /* Premier League purple */
     color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
 }
 
-.good-tag {
-    background-color: #28a745;
+h1, h2, h3 {
+    margin-bottom: 10px;
 }
 
-.bad-tag {
-    background-color: #dc3545;
+/* Visualization container */
+.visualization-card {
+    background-color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.image-container {
-    margin: 2rem 0;
-    text-align: center;
+/* Controls section */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
-.image-container img {
-    max-width: 100%;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.description {
-    margin-bottom: 2rem;
-}
-
-.features, .limitations {
-    margin-bottom: 1.5rem;
-}
-
-.features h3, .limitations h3 {
-    color: var(--accent-color);
-    margin-bottom: 0.5rem;
-}
-
-ul {
-    padding-left: 2rem;
-    margin-bottom: 1rem;
-}
-
-li {
-    margin-bottom: 0.5rem;
-}
-
-.info-box {
-    background-color: rgba(233, 0, 82, 0.1);
-    border-left: 4px solid var(--accent-color);
-    padding: 1rem;
-    margin: 1.5rem 0;
-    border-radius: 0 4px 4px 0;
-}
-
-code {
-    font-family: monospace;
+.control-group {
+    padding: 5px 10px;
     background-color: #f1f1f1;
-    padding: 0.2rem 0.4rem;
-    border-radius: 3px;
-}
-
-pre {
-    background-color: #f1f1f1;
-    padding: 1rem;
     border-radius: 4px;
-    overflow-x: auto;
-    margin: 1.5rem 0;
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 0.9rem;
 }
 
-.prototype {
-    margin: 2rem 0;
-    padding: 1rem;
+select, button, input {
+    padding: 5px;
+    border-radius: 4px;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fafafa;
 }
 
-/* Visualization-specific styles */
-#scatter-plot-container svg {
-    display: block;
+/* Position markers */
+.position-marker {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.position-forward {
+    background-color: #e90052; /* PL pink */
+}
+
+.position-midfielder {
+    background-color: #04f5ff; /* PL blue */
+}
+
+.position-defender {
+    background-color: #00ff85; /* PL green */
+}
+
+.position-goalkeeper {
+    background-color: #ff9e00; /* PL orange */
+}
+
+/* Scatter plot container */
+#scatter-plot {
+    width: 100%;
+    height: 600px;
     margin: 0 auto;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
 }
 
+/* Tooltip */
 .tooltip {
     position: absolute;
-    padding: 8px;
+    padding: 10px;
     background: rgba(0, 0, 0, 0.8);
     color: white;
     border-radius: 4px;
     pointer-events: none;
-    font-size: 12px;
+    font-size: 14px;
     z-index: 100;
-    max-width: 200px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    max-width: 250px;
 }
 
-/* Controls */
-.controls {
-    margin-bottom: 1.5rem;
+/* Stats panel */
+.stats-panel {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 20px;
+    margin-top: 20px;
 }
 
-.control-group {
-    padding: 0.5rem 1rem;
+.stats-card {
+    flex: 1;
+    min-width: 250px;
+    padding: 10px;
     background-color: #f1f1f1;
     border-radius: 4px;
 }
 
-select, button {
-    padding: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    background-color: white;
+.stats-list {
+    list-style-type: none;
 }
 
-select:focus, button:focus {
-    outline: 2px solid var(--secondary-color);
-}
-
-button {
-    background-color: var(--primary-color);
-    color: white;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: var(--accent-color);
+.stats-list li {
+    margin-bottom: 5px;
 }
 
 /* Responsive adjustments */
@@ -254,20 +137,11 @@ button:hover {
         flex-direction: column;
     }
     
-    .image-container img {
-        width: 100%;
+    #scatter-plot {
+        height: 400px;
     }
     
-    pre {
-        font-size: 0.8rem;
+    .stats-panel {
+        flex-direction: column;
     }
-}
-
-footer {
-    text-align: center;
-    margin-top: 3rem;
-    padding: 1rem;
-    color: var(--text-color);
-    opacity: 0.7;
-    font-size: 0.9rem;
 }

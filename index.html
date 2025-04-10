@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premier League Position Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Premier League Player Statistics</h1>
+            <p>Explore player performance metrics across different positions</p>
+        </header>
+        
+        <div class="visualization-card">
+            <h2>Position Performance Scatter Plot</h2>
+            <p>Compare how players perform across different metrics, colored by position</p>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="x-metric">X-Axis Metric:</label>
+                    <select id="x-metric">
+                        <option value="Goals">Goals</option>
+                        <option value="Assists">Assists</option>
+                        <option value="Passes">Passes</option>
+                        <option value="Tackles">Tackles</option>
+                        <option value="Clean sheets">Clean Sheets</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="y-metric">Y-Axis Metric:</label>
+                    <select id="y-metric">
+                        <option value="Goals">Goals</option>
+                        <option value="Assists" selected>Assists</option>
+                        <option value="Passes">Passes</option>
+                        <option value="Tackles">Tackles</option>
+                        <option value="Clean sheets">Clean Sheets</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="size-metric">Size Metric:</label>
+                    <select id="size-metric">
+                        <option value="Appearances" selected>Appearances</option>
+                        <option value="Age">Age</option>
+                        <option value="Passes">Passes</option>
+                        <option value="Goals">Goals</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Position Filter:</label>
+                    <div id="position-checkboxes">
+                        <!-- Dynamically populated in JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="club-filter">Club Filter:</label>
+                    <select id="club-filter">
+                        <option value="All">All Clubs</option>
+                        <!-- Dynamically populated in JavaScript -->
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="min-appearances">Min Appearances:</label>
+                    <input type="number" id="min-appearances" min="0" max="50" value="10" step="1">
+                </div>
+            </div>
+            
+            <div id="scatter-plot"></div>
+            
+            <div class="stats-panel">
+                <div class="stats-card">
+                    <h3>Position Statistics</h3>
+                    <ul class="stats-list" id="position-stats">
+                        <!-- Dynamically populated in JavaScript -->
+                    </ul>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Selected Player</h3>
+                    <div id="selected-player-stats">
+                        <p>Click on a player to see detailed statistics</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
