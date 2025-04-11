@@ -145,21 +145,11 @@ select, button, input {
         flex-direction: column;
     }
 }
-/* Soccer Field Image Styles */
-.soccer-field-container {
-    text-align: center;
-    margin: 20px 0;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-}
 
 .soccer-field-image {
     width: 100%;
     max-height: 500px;
-    object-fit: contain;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Tableau Items Styles */
@@ -186,14 +176,8 @@ select, button, input {
 }
 
 .tableau-link {
-    display: inline-block;
     padding: 10px 20px;
-    background-color: #37003c;
+    background-color: blueviolet;
     color: white;
-    text-decoration: none;
-    border-radius: 5px;
     font-weight: bold;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-    margin-bottom: 15px;
 }
