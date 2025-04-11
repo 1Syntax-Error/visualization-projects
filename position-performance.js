@@ -240,18 +240,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 tooltip.transition()
                     .duration(500)
                     .style("opacity", 0);
-            })
-            .on("click", function(event, d) {
-                // Update player stats panel
-                updatePlayerStats(d);
-                
-                // Highlight the selected player
-                svg.selectAll("circle")
-                    .style("stroke-width", 1);
-                
-                d3.select(this)
-                    .style("stroke", "#000")
-                    .style("stroke-width", 2);
             });
         
         // Add legend - positioned within the plot area
@@ -302,6 +290,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const positionStats = document.getElementById('position-stats');
         positionStats.innerHTML = '';
         
+        // Create a 3-column grid for position stats
+        positionStats.style.display = 'grid';
+        positionStats.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        positionStats.style.gap = '15px';
+        
         positions.forEach(position => {
             const playersInPosition = data.filter(d => d.Position === position);
             
@@ -310,64 +303,58 @@ document.addEventListener('DOMContentLoaded', function() {
                 const xAvg = d3.mean(playersInPosition, d => d[xMetric]);
                 const yAvg = d3.mean(playersInPosition, d => d[yMetric]);
                 
-                const listItem = document.createElement('li');
+                const statCard = document.createElement('div');
+                statCard.className = 'position-stat-card';
+                statCard.style.padding = '10px';
+                statCard.style.backgroundColor = '#f5f5f5';
+                statCard.style.borderRadius = '4px';
+                statCard.style.border = `2px solid ${getPositionColor(position)}`;
+                
+                // Add marker and title in the same row
+                const titleRow = document.createElement('div');
+                titleRow.style.display = 'flex';
+                titleRow.style.alignItems = 'center';
+                titleRow.style.marginBottom = '5px';
+                
                 const marker = document.createElement('span');
                 marker.className = `position-marker position-${position.toLowerCase()}`;
+                titleRow.appendChild(marker);
                 
-                listItem.appendChild(marker);
-                listItem.innerHTML += `
-                    <strong>${position}</strong> (${playersInPosition.length} players)<br>
-                    Avg ${xMetric}: ${xAvg?.toFixed(2) || 'N/A'}<br>
-                    Avg ${yMetric}: ${yAvg?.toFixed(2) || 'N/A'}
-                `;
-                positionStats.appendChild(listItem);
+                const title = document.createElement('strong');
+                title.textContent = position;
+                title.style.marginLeft = '5px';
+                titleRow.appendChild(title);
                 
-                // Add a small spacing between position stats
-                const spacer = document.createElement('li');
-                spacer.style.height = '10px';
-                positionStats.appendChild(spacer);
+                statCard.appendChild(titleRow);
+                
+                // Add player count
+                const count = document.createElement('div');
+                count.textContent = `${playersInPosition.length} players`;
+                count.style.marginBottom = '5px';
+                statCard.appendChild(count);
+                
+                // Add metrics
+                const xMetricEl = document.createElement('div');
+                xMetricEl.textContent = `Avg ${xMetric}: ${xAvg?.toFixed(2) || 'N/A'}`;
+                statCard.appendChild(xMetricEl);
+                
+                const yMetricEl = document.createElement('div');
+                yMetricEl.textContent = `Avg ${yMetric}: ${yAvg?.toFixed(2) || 'N/A'}`;
+                statCard.appendChild(yMetricEl);
+                
+                positionStats.appendChild(statCard);
             }
         });
     }
     
-    function updatePlayerStats(player) {
-        const statsPanel = document.getElementById('selected-player-stats');
+    function getPositionColor(position) {
+        const colorMap = {
+            "Forward": "#e90052",
+            "Midfielder": "#04f5ff",
+            "Defender": "#00ff85",
+            "Goalkeeper": "#ff9e00"
+        };
         
-        // Create a list of all non-null stats for this player
-        const stats = Object.keys(player)
-            .filter(key => player[key] !== null && player[key] !== undefined && 
-                         typeof player[key] !== 'object' && key !== 'Name')
-            .map(key => {
-                let value = player[key];
-                if (typeof value === 'number' && !Number.isInteger(value)) {
-                    value = value.toFixed(2);
-                }
-                return { key, value };
-            });
-        
-        // Create the HTML for the stats panel
-        let html = `
-            <h4>${player.Name}</h4>
-            <p>${player.Club} | ${player.Position} | ${player.Nationality}</p>
-            <div style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <th style="text-align: left; padding: 5px; border-bottom: 1px solid #ddd;">Stat</th>
-                        <th style="text-align: right; padding: 5px; border-bottom: 1px solid #ddd;">Value</th>
-                    </tr>
-        `;
-        
-        stats.forEach(stat => {
-            html += `
-                <tr>
-                    <td style="text-align: left; padding: 5px; border-bottom: 1px solid #eee;">${stat.key}</td>
-                    <td style="text-align: right; padding: 5px; border-bottom: 1px solid #eee;">${stat.value}</td>
-                </tr>
-            `;
-        });
-        
-        html += `</table></div>`;
-        
-        statsPanel.innerHTML = html;
+        return colorMap[position] || "#999";
     }
 });

@@ -1,15 +1,5 @@
 /* Simple CSS for Premier League Visualization */
 
-.container {
-    display: flex;
-    flex-direction: column;
-}
-
-#positions-section { order: 1; }
-#statistics-section { order: 2; }
-#scatter-plot-section { order: 3; }
-#age-performance-section { order: 4; }
-
 /* Basic styles */
 * {
     margin: 0;
@@ -82,19 +72,19 @@ select, button, input {
 }
 
 .position-forward {
-    background-color: red;
+    background-color: #e90052; /* Premier League red */
 }
 
 .position-midfielder {
-    background-color: blue;
+    background-color: #04f5ff; /* Light blue */
 }
 
 .position-defender {
-    background-color: green;
+    background-color: #00ff85; /* Light green */
 }
 
 .position-goalkeeper {
-    background-color: orange;
+    background-color: #ff9e00; /* Orange */
 }
 
 /* Scatter plot container */
@@ -117,28 +107,38 @@ select, button, input {
     max-width: 250px;
 }
 
-/* Stats panel */
+/* Position Statistics - Updated to horizontal layout */
+#position-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+    list-style-type: none;
+}
+
+.position-stat-card {
+    padding: 12px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.position-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Stats panel - Modified to show only position stats */
 .stats-panel {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
     margin-top: 20px;
 }
 
 .stats-card {
-    flex: 1;
-    min-width: 250px;
-    padding: 10px;
+    padding: 15px;
     background-color: #f1f1f1;
     border-radius: 4px;
-}
-
-.stats-list {
-    list-style-type: none;
-}
-
-.stats-list li {
-    margin-bottom: 5px;
+    margin-bottom: 15px;
 }
 
 /* Responsive adjustments */
@@ -151,10 +151,17 @@ select, button, input {
         height: 400px;
     }
     
-    .stats-panel {
-        flex-direction: column;
+    #position-stats {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
+
+@media (max-width: 480px) {
+    #position-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Soccer Field Image Styles */
 .soccer-field-container {
     text-align: center;

@@ -1,6 +1,6 @@
-// Age vs Performance Visualization for Premier League Player Statistics
+// Simplified Age vs Performance Visualization for Premier League Player Statistics
 document.addEventListener('DOMContentLoaded', function() {
-    // Dataset URL (direct link to raw file)
+    // Dataset URL
     const datasetUrl = 'https://raw.githubusercontent.com/1Syntax-Error/visualization-projects/main/dataset%20-%202020-09-24.csv';
     
     // Load and process the data
@@ -17,8 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 dynamicTyping: true,
                 skipEmptyLines: true,
                 complete: function(results) {
-                    const data = results.data;
-                    processData(data);
+                    processData(results.data);
                 },
                 error: function(error) {
                     console.error("Error parsing CSV:", error);
@@ -30,9 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function processData(rawData) {
-        // Clean and process the data
+        // Clean and filter data
         const data = rawData.filter(player => {
-            // Filter out players with missing essential data
             return player.Age && player.Position && player.Appearances;
         }).map(player => {
             // Convert percentage strings to numbers
@@ -42,9 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // Add derived metrics
-            player.ageGroup = getAgeGroup(player.Age);
-            
             return player;
         });
         
@@ -53,17 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
         createVisualization(data);
     }
     
-    function getAgeGroup(age) {
-        if (age < 23) return "Young (Under 23)";
-        if (age < 27) return "Early Prime (23-26)";
-        if (age < 30) return "Prime (27-29)";
-        if (age < 33) return "Late Prime (30-32)";
-        return "Veteran (33+)";
-    }
-    
     function setupControls(data) {
         // Create container for the visualization
-        const mainContainer = document.querySelector('.visualization-card');
+        const mainContainer = document.querySelector('#age-performance-section');
         if (!mainContainer) return;
         
         // Create heading
@@ -91,15 +78,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const metricSelect = document.createElement('select');
         metricSelect.id = 'performance-metric';
         
+        // Add the most important performance metrics
         const metrics = [
             'Goals', 
             'Goals per match',
             'Assists', 
             'Passes per match',
             'Shooting accuracy %',
-            'Tackle success %',
-            'Successful 50/50s',
-            'Aerial battles won'
+            'Tackle success %'
         ];
         
         metrics.forEach(metric => {
@@ -112,34 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
         metricGroup.appendChild(metricLabel);
         metricGroup.appendChild(metricSelect);
         controlsDiv.appendChild(metricGroup);
-        
-        // Normalization selector
-        const normGroup = document.createElement('div');
-        normGroup.className = 'control-group';
-        
-        const normLabel = document.createElement('label');
-        normLabel.textContent = 'Normalize by:';
-        normLabel.htmlFor = 'normalization';
-        
-        const normSelect = document.createElement('select');
-        normSelect.id = 'normalization';
-        
-        const normOptions = [
-            { value: 'none', text: 'Raw Values' },
-            { value: 'appearances', text: 'Per Appearance' }
-        ];
-        
-        normOptions.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt.value;
-            option.textContent = opt.text;
-            if (opt.value === 'appearances') option.selected = true;
-            normSelect.appendChild(option);
-        });
-        
-        normGroup.appendChild(normLabel);
-        normGroup.appendChild(normSelect);
-        controlsDiv.appendChild(normGroup);
         
         // Position filter
         const posGroup = document.createElement('div');
@@ -203,53 +161,28 @@ document.addEventListener('DOMContentLoaded', function() {
         controlsDiv.appendChild(appGroup);
         
         // Create visualization container
-        const visContainer = document.createElement('div');
-        visContainer.className = 'visualization-container';
-        visContainer.style.display = 'flex';
-        visContainer.style.flexDirection = 'column';
-        visContainer.style.gap = '20px';
-        visContainer.style.marginTop = '20px';
-        mainContainer.appendChild(visContainer);
-        
-        // Main chart
         const chartDiv = document.createElement('div');
         chartDiv.id = 'age-performance-chart';
         chartDiv.style.width = '100%';
         chartDiv.style.height = '500px';
+        chartDiv.style.marginTop = '20px';
         chartDiv.style.border = '1px solid #eee';
         chartDiv.style.borderRadius = '4px';
         chartDiv.style.backgroundColor = '#fafafa';
-        visContainer.appendChild(chartDiv);
-        
-        // Age group analysis
-        const ageGroupTitle = document.createElement('h3');
-        ageGroupTitle.textContent = 'Age Group Analysis';
-        ageGroupTitle.style.marginTop = '20px';
-        mainContainer.appendChild(ageGroupTitle);
-        
-        const ageGroupStats = document.createElement('div');
-        ageGroupStats.id = 'age-group-stats';
-        ageGroupStats.style.display = 'grid';
-        ageGroupStats.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        ageGroupStats.style.gap = '15px';
-        ageGroupStats.style.marginTop = '10px';
-        mainContainer.appendChild(ageGroupStats);
+        mainContainer.appendChild(chartDiv);
         
         // Add event listeners to the controls
         metricSelect.addEventListener('change', () => updateVisualization(data));
-        normSelect.addEventListener('change', () => updateVisualization(data));
         appInput.addEventListener('input', () => updateVisualization(data));
     }
     
     function createVisualization(data) {
-        // Initial visualization with default settings
         updateVisualization(data);
     }
     
     function updateVisualization(data) {
         // Get selected options
         const performanceMetric = document.getElementById('performance-metric').value;
-        const normalization = document.getElementById('normalization').value;
         const minAppearances = parseInt(document.getElementById('min-appearances-age').value) || 0;
         
         // Get selected positions
@@ -263,31 +196,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Create age performance chart
-        createAgePerformanceChart(filteredData, performanceMetric, normalization);
-        
-        // Update age group statistics
-        updateAgeGroupStats(filteredData, performanceMetric, normalization);
+        createAgePerformanceChart(filteredData, performanceMetric);
     }
     
-    function getNormalizedValue(player, metric, normalization) {
-        if (!player[metric] && player[metric] !== 0) return null;
-        
-        switch(normalization) {
-            case 'appearances':
-                return player.Appearances > 0 ? player[metric] / player.Appearances : null;
-            default:
-                return player[metric];
-        }
-    }
-    
-    function getMetricLabel(metric, normalization) {
-        if (normalization === 'appearances') {
-            return `${metric} per Appearance`;
-        }
-        return metric;
-    }
-    
-    function createAgePerformanceChart(data, metric, normalization) {
+    function createAgePerformanceChart(data, metric) {
         // Clear previous visualization
         d3.select("#age-performance-chart").html("");
         
@@ -312,16 +224,8 @@ document.addEventListener('DOMContentLoaded', function() {
             ])
             .range([0, width]);
         
-        // Prepare normalized data
-        const normalizedData = data.map(player => {
-            return {
-                ...player,
-                normalizedValue: getNormalizedValue(player, metric, normalization)
-            };
-        }).filter(player => player.normalizedValue !== null);
-        
         const yScale = d3.scaleLinear()
-            .domain([0, d3.max(normalizedData, d => d.normalizedValue) * 1.1])
+            .domain([0, d3.max(data, d => d[metric]) * 1.1])
             .range([height, 0]);
         
         // Create color scale for positions
@@ -350,54 +254,39 @@ document.addEventListener('DOMContentLoaded', function() {
             .attr("fill", "black")
             .style("text-anchor", "middle")
             .style("font-size", "14px")
-            .text(getMetricLabel(metric, normalization));
+            .text(metric);
         
         // Group data by position
-        const positionGroups = d3.group(normalizedData, d => d.Position);
+        const positionGroups = d3.group(data, d => d.Position);
         
-        // Create line generator
-        const line = d3.line()
-            .x(d => xScale(d.Age))
-            .y(d => yScale(d.normalizedValue))
-            .curve(d3.curveMonotoneX);
-        
-        // Add trend lines for each position
+        // Add trend lines for each position using a simple loess smoothing approach
         positionGroups.forEach((players, position) => {
-            // Sort players by age for the line
-            const sortedPlayers = [...players].sort((a, b) => a.Age - b.Age);
-            
-            // Aggregate data by age for smoother trends
-            const ageGroups = d3.group(sortedPlayers, d => d.Age);
-            const aggregatedData = Array.from(ageGroups, ([age, players]) => {
-                return {
-                    Age: +age,
-                    normalizedValue: d3.mean(players, p => p.normalizedValue),
-                    Position: position,
-                    count: players.length
-                };
-            }).sort((a, b) => a.Age - b.Age);
-            
             // Only draw trend line if we have enough data points
-            if (aggregatedData.length > 1) {
-                // Add area under the line
-                const area = d3.area()
-                    .x(d => xScale(d.Age))
-                    .y0(height)
-                    .y1(d => yScale(d.normalizedValue))
-                    .curve(d3.curveMonotoneX);
+            if (players.length > 5) {
+                // Group by age
+                const ageGroups = d3.group(players, d => d.Age);
                 
-                svg.append("path")
-                    .datum(aggregatedData)
-                    .attr("fill", colorScale(position))
-                    .attr("fill-opacity", 0.2)
-                    .attr("d", area);
+                // Create aggregated data (average metric by age)
+                const aggregatedData = Array.from(ageGroups, ([age, agePlayers]) => {
+                    return {
+                        age: +age,
+                        value: d3.mean(agePlayers, p => p[metric]),
+                        position: position
+                    };
+                }).sort((a, b) => a.age - b.age);
+                
+                // Create line generator
+                const line = d3.line()
+                    .x(d => xScale(d.age))
+                    .y(d => yScale(d.value))
+                    .curve(d3.curveBasis);
                 
                 // Add the line
                 svg.append("path")
                     .datum(aggregatedData)
                     .attr("fill", "none")
                     .attr("stroke", colorScale(position))
-                    .attr("stroke-width", 2.5)
+                    .attr("stroke-width", 3)
                     .attr("opacity", 0.8)
                     .attr("d", line);
             }
@@ -405,11 +294,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add scatter points
         svg.selectAll(".age-point")
-            .data(normalizedData)
+            .data(data)
             .enter()
             .append("circle")
             .attr("cx", d => xScale(d.Age))
-            .attr("cy", d => yScale(d.normalizedValue))
+            .attr("cy", d => yScale(d[metric]))
             .attr("r", 4)
             .attr("fill", d => colorScale(d.Position))
             .attr("stroke", "white")
@@ -424,15 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Create tooltip
                 const tooltip = d3.select("body").append("div")
                     .attr("class", "tooltip")
-                    .style("opacity", 0)
-                    .style("position", "absolute")
-                    .style("background", "rgba(0,0,0,0.7)")
-                    .style("color", "white")
-                    .style("padding", "10px")
-                    .style("border-radius", "5px")
-                    .style("pointer-events", "none")
-                    .style("font-size", "12px")
-                    .style("z-index", 100);
+                    .style("opacity", 0);
                 
                 tooltip.transition()
                     .duration(200)
@@ -443,7 +324,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${d.Club}<br>
                     Position: ${d.Position}<br>
                     ${metric}: ${d[metric]}<br>
-                    ${getMetricLabel(metric, normalization)}: ${d.normalizedValue.toFixed(2)}<br>
                     Appearances: ${d.Appearances}
                 `)
                 .style("left", (event.pageX + 10) + "px")
@@ -473,8 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .attr("x2", 20)
                 .attr("y2", 10)
                 .attr("stroke", colorScale(position))
-                .attr("stroke-width", 2.5)
-                .attr("opacity", 0.8);
+                .attr("stroke-width", 2.5);
             
             g.append("circle")
                 .attr("cx", 10)
@@ -491,13 +370,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 .style("font-size", "12px");
         });
         
-        // Add age brackets visualization
+        // Add simple age brackets
         const ageBrackets = [
-            { label: "Young", start: 17, end: 22 },
-            { label: "Early Prime", start: 23, end: 26 },
-            { label: "Prime", start: 27, end: 29 },
-            { label: "Late Prime", start: 30, end: 32 },
-            { label: "Veteran", start: 33, end: 40 }
+            { label: "Young", start: 17, end: 23 },
+            { label: "Prime", start: 24, end: 30 },
+            { label: "Veteran", start: 31, end: 40 }
         ];
         
         // Add age bracket backgrounds
@@ -517,91 +394,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 .attr("font-size", "10px")
                 .attr("fill", "#777")
                 .text(bracket.label);
-        });
-    }
-    
-    function updateAgeGroupStats(data, metric, normalization) {
-        const ageGroupsDiv = document.getElementById('age-group-stats');
-        ageGroupsDiv.innerHTML = '';
-        
-        // Define age groups
-        const ageGroups = [
-            { name: "Young (U23)", min: 17, max: 22, class: "age-group-young" },
-            { name: "Prime (23-29)", min: 23, max: 29, class: "age-group-prime" },
-            { name: "Experienced (30-32)", min: 30, max: 32, class: "age-group-experienced" },
-            { name: "Veteran (33+)", min: 33, max: 40, class: "age-group-veteran" }
-        ];
-        
-        // Prepare normalized data
-        const normalizedData = data.map(player => {
-            return {
-                ...player,
-                normalizedValue: getNormalizedValue(player, metric, normalization)
-            };
-        }).filter(player => player.normalizedValue !== null);
-        
-        // Calculate stats for each age group
-        ageGroups.forEach(group => {
-            const playersInGroup = normalizedData.filter(p => p.Age >= group.min && p.Age <= group.max);
-            
-            if (playersInGroup.length > 0) {
-                const avgValue = d3.mean(playersInGroup, p => p.normalizedValue);
-                const positions = d3.group(playersInGroup, p => p.Position);
-                
-                // Find position with highest average in this age group
-                let highestPosition = '';
-                let highestAvg = -Infinity;
-                
-                positions.forEach((players, position) => {
-                    const posAvg = d3.mean(players, p => p.normalizedValue);
-                    if (posAvg > highestAvg) {
-                        highestAvg = posAvg;
-                        highestPosition = position;
-                    }
-                });
-                
-                // Get top performer in this age group
-                const topPerformer = playersInGroup.reduce((prev, current) => 
-                    (prev.normalizedValue > current.normalizedValue) ? prev : current
-                );
-                
-                // Create age bracket card
-                const bracket = document.createElement('div');
-                bracket.className = `age-bracket ${group.class}`;
-                bracket.style.padding = '12px';
-                bracket.style.backgroundColor = 'white';
-                bracket.style.borderRadius = '4px';
-                bracket.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                
-                const title = document.createElement('h4');
-                title.textContent = group.name;
-                title.style.marginTop = '0';
-                title.style.marginBottom = '8px';
-                bracket.appendChild(title);
-                
-                // Stats
-                const playerCount = document.createElement('p');
-                playerCount.textContent = `Players: ${playersInGroup.length}`;
-                playerCount.style.margin = '4px 0';
-                bracket.appendChild(playerCount);
-                
-                const avgStat = document.createElement('p');
-                avgStat.textContent = `Avg ${getMetricLabel(metric, normalization)}: ${avgValue.toFixed(2)}`;
-                avgStat.style.margin = '4px 0';
-                bracket.appendChild(avgStat);
-                
-                const topPosStat = document.createElement('p');
-                topPosStat.textContent = `Best Position: ${highestPosition} (${highestAvg.toFixed(2)})`;
-                topPosStat.style.margin = '4px 0';
-                bracket.appendChild(topPosStat);
-                
-                const topPlayerStat = document.createElement('p');
-                topPlayerStat.textContent = `Top Performer: ${topPerformer.Name} (${topPerformer.normalizedValue.toFixed(2)})`;
-                topPlayerStat.style.margin = '4px 0';
-                bracket.appendChild(topPlayerStat);
-                
-                ageGroupsDiv.appendChild(bracket);
-            }
         });
     }
 });
