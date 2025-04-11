@@ -1,5 +1,15 @@
 /* Simple CSS for Premier League Visualization */
 
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+#positions-section { order: 1; }
+#statistics-section { order: 2; }
+#scatter-plot-section { order: 3; }
+#age-performance-section { order: 4; }
+
 /* Basic styles */
 * {
     margin: 0;
