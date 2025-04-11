@@ -774,4 +774,195 @@ document.addEventListener('DOMContentLoaded', function() {
         const ageGroups = [
             { name: "Young (U23)", min: 17, max: 22, class: "age-group-young" },
             { name: "Prime (23-29)", min: 23, max: 29, class: "age-group-prime" },
-            { name: "
+            { name: "Experienced (30-32)", min: 30, max: 32, class: "age-group-experienced" },
+            { name: "Veteran (33+)", min: 33, max: 40, class: "age-group-veteran" }
+        ];
+        
+        // Prepare normalized data
+        const normalizedData = data.map(player => {
+            return {
+                ...player,
+                normalizedValue: getNormalizedValue(player, metric, normalization)
+            };
+        }).filter(player => player.normalizedValue !== null);
+        
+        // Calculate stats for each age group
+        ageGroups.forEach(group => {
+            const playersInGroup = normalizedData.filter(p => p.Age >= group.min && p.Age <= group.max);
+            
+            if (playersInGroup.length > 0) {
+                const avgValue = d3.mean(playersInGroup, p => p.normalizedValue);
+                const positions = d3.group(playersInGroup, p => p.Position);
+                
+                // Find position with highest average in this age group
+                let highestPosition = '';
+                let highestAvg = -Infinity;
+                
+                positions.forEach((players, position) => {
+                    const posAvg = d3.mean(players, p => p.normalizedValue);
+                    if (posAvg > highestAvg) {
+                        highestAvg = posAvg;
+                        highestPosition = position;
+                    }
+                });
+                
+                // Get top performer in this age group
+                const topPerformer = playersInGroup.reduce((prev, current) => 
+                    (prev.normalizedValue > current.normalizedValue) ? prev : current
+                );
+                
+                // Create age bracket card
+                const bracket = document.createElement('div');
+                bracket.className = `age-bracket ${group.class}`;
+                
+                const title = document.createElement('h4');
+                title.textContent = group.name;
+                bracket.appendChild(title);
+                
+                // Stats
+                const playerCount = document.createElement('p');
+                playerCount.textContent = `Players: ${playersInGroup.length}`;
+                bracket.appendChild(playerCount);
+                
+                const avgStat = document.createElement('p');
+                avgStat.textContent = `Avg ${getMetricLabel(metric, normalization)}: ${avgValue.toFixed(2)}`;
+                bracket.appendChild(avgStat);
+                
+                const topPosStat = document.createElement('p');
+                topPosStat.textContent = `Best Position: ${highestPosition} (${highestAvg.toFixed(2)})`;
+                bracket.appendChild(topPosStat);
+                
+                const topPlayerStat = document.createElement('p');
+                topPlayerStat.textContent = `Top Performer: ${topPerformer.Name} (${topPerformer.normalizedValue.toFixed(2)})`;
+                bracket.appendChild(topPlayerStat);
+                
+                ageGroupsDiv.appendChild(bracket);
+            }
+        });
+    }
+    
+    function updatePerformanceInsights(data, metric, normalization) {
+        const insightsDiv = document.getElementById('performance-insights');
+        insightsDiv.innerHTML = '';
+        
+        // Prepare normalized data
+        const normalizedData = data.map(player => {
+            return {
+                ...player,
+                normalizedValue: getNormalizedValue(player, metric, normalization)
+            };
+        }).filter(player => player.normalizedValue !== null);
+        
+        if (normalizedData.length === 0) {
+            insightsDiv.innerHTML = '<p>No data available for selected filters</p>';
+            return;
+        }
+        
+        // Find peak age for the selected metric
+        const agePerformance = d3.rollup(
+            normalizedData,
+            v => d3.mean(v, d => d.normalizedValue),
+            d => d.Age
+        );
+        
+        const ageEntries = Array.from(agePerformance.entries())
+            .filter(([age, value]) => {
+                // Filter out ages with very few players (less than 3% of the dataset)
+                const playersAtAge = normalizedData.filter(p => p.Age === age).length;
+                return playersAtAge >= normalizedData.length * 0.03;
+            })
+            .sort((a, b) => b[1] - a[1]);
+        
+        let peakAge = ageEntries.length > 0 ? ageEntries[0][0] : null;
+        
+        // Find performance by position
+        const positionPerformance = d3.rollup(
+            normalizedData,
+            v => d3.mean(v, d => d.normalizedValue),
+            d => d.Position
+        );
+        
+        const positionEntries = Array.from(positionPerformance.entries())
+            .sort((a, b) => b[1] - a[1]);
+        
+        // Find overall trend (increasing or decreasing with age)
+        const trendData = Array.from(d3.rollup(
+            normalizedData,
+            v => d3.mean(v, d => d.normalizedValue),
+            d => d.Age
+        ).entries()).sort((a, b) => a[0] - b[0]);
+        
+        let trend = "neutral";
+        if (trendData.length > 3) {
+            // Simple linear regression to determine trend
+            const n = trendData.length;
+            const sumX = trendData.reduce((sum, [x, y]) => sum + x, 0);
+            const sumY = trendData.reduce((sum, [x, y]) => sum + y, 0);
+            const sumXY = trendData.reduce((sum, [x, y]) => sum + x * y, 0);
+            const sumXX = trendData.reduce((sum, [x, y]) => sum + x * x, 0);
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            
+            trend = slope > 0.05 ? "increasing" : (slope < -0.05 ? "decreasing" : "neutral");
+        }
+        
+        // Create insights
+        const title = document.createElement('h4');
+        title.textContent = `Insights for ${getMetricLabel(metric, normalization)}`;
+        insightsDiv.appendChild(title);
+        
+        if (peakAge) {
+            const peakAgePara = document.createElement('p');
+            peakAgePara.innerHTML = `<strong>Peak Age:</strong> ${peakAge} years`;
+            
+            // Add trend indicator
+            const trendSpan = document.createElement('span');
+            trendSpan.className = "trend-indicator trend-" + 
+                (trend === "increasing" ? "up" : (trend === "decreasing" ? "down" : "flat"));
+            peakAgePara.appendChild(trendSpan);
+            
+            insightsDiv.appendChild(peakAgePara);
+        }
+        
+        if (positionEntries.length > 0) {
+            const bestPositionPara = document.createElement('p');
+            bestPositionPara.innerHTML = `<strong>Best Position:</strong> ${positionEntries[0][0]} (${positionEntries[0][1].toFixed(2)})`;
+            insightsDiv.appendChild(bestPositionPara);
+        }
+        
+        // Top performers
+        const topPerformers = [...normalizedData]
+            .sort((a, b) => b.normalizedValue - a.normalizedValue)
+            .slice(0, 3);
+        
+        const topPara = document.createElement('p');
+        topPara.innerHTML = `<strong>Top Performers:</strong>`;
+        insightsDiv.appendChild(topPara);
+        
+        const topList = document.createElement('ol');
+        topList.style.marginLeft = "20px";
+        topList.style.marginTop = "5px";
+        
+        topPerformers.forEach(player => {
+            const item = document.createElement('li');
+            item.textContent = `${player.Name} (${player.Age}, ${player.Position}): ${player.normalizedValue.toFixed(2)}`;
+            topList.appendChild(item);
+        });
+        
+        insightsDiv.appendChild(topList);
+        
+        // Add narrative insight based on trend
+        const insightPara = document.createElement('p');
+        insightPara.style.marginTop = "10px";
+        
+        if (trend === "increasing") {
+            insightPara.textContent = `This metric tends to improve with age and experience, with players reaching their peak around age ${peakAge}.`;
+        } else if (trend === "decreasing") {
+            insightPara.textContent = `This metric tends to decline with age, with players performing best at younger ages (around ${peakAge}).`;
+        } else {
+            insightPara.textContent = `This metric remains relatively stable across age groups, with individual skill being more important than age.`;
+        }
+        
+        insightsDiv.appendChild(insightPara);
+    }
+});
