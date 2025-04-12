@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premier League Position Performance Analysis</title>
+    <title>Premier League Player Statistics Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Premier League Player Statistics</h1>
-            <p>Explore player performance metrics across different positions</p>
+            <p>Explore and analyze player performance metrics across different positions and teams</p>
         </header>
         
         <!-- Soccer Field Image Section -->
@@ -23,22 +23,9 @@
             </div>
         </div>
         
-        <!-- Tableau Screenshot Section -->
-        <div class="visualization-card">
-            <h2>Premier League Statistics</h2>
-            <p>Distribution of players by position, club, and appearances</p>
-            
-            <div class="tableau-container">
-                <!-- Single Tableau image containing both visualizations -->
-                <img src="Public/Tableau Pic.png" alt="Premier League Player Statistics" class="tableau-screenshot">
-                
-                <!-- Link to Tableau Public -->
-                <a href="https://public.tableau.com/app/profile/paul.gang.tangyie8402/viz/visualizationproject_17443953305650/Dashboard1" target="_blank" class="tableau-link">
-                    View Interactive Dashboard on Tableau Public
-                </a>
-            </div>
-            
-            <p><em>The interactive version of this dashboard is available on Tableau Public. Click the link above to explore the data in detail.</em></p>
+        <!-- Team Comparison Dashboard Section -->
+        <div class="visualization-card" id="team-comparison-section">
+            <!-- This section will be populated by the JavaScript -->
         </div>
         
         <!-- Position Performance Scatter Plot Section -->
@@ -109,7 +96,7 @@
             
             <div id="scatter-plot"></div>
             
-            <!-- Position Statistics Section (now horizontal with 3 columns) -->
+            <!-- Position Statistics Section -->
             <div class="stats-panel">
                 <h3>Position Statistics</h3>
                 <div id="position-stats">
@@ -122,11 +109,37 @@
         <div class="visualization-card" id="age-performance-section">
             <!-- Age vs Performance visualization will be created here by the JavaScript -->
         </div>
-
+        
+        <!-- Tableau Screenshot Section -->
+        <div class="visualization-card">
+            <h2>Premier League Statistics on Tableau</h2>
+            <p>Distribution of players by position, club, and appearances</p>
+            
+            <div class="tableau-container">
+                <!-- Single Tableau image containing both visualizations -->
+                <img src="Public/Tableau Pic.png" alt="Premier League Player Statistics" class="tableau-screenshot">
+                
+                <!-- Link to Tableau Public -->
+                <a href="https://public.tableau.com/app/profile/paul.gang.tangyie8402/viz/visualizationproject_17443953305650/Dashboard1" target="_blank" class="tableau-link">
+                    View Interactive Dashboard on Tableau Public
+                </a>
+            </div>
+            
+            <p><em>The interactive version of this dashboard is available on Tableau Public. Click the link above to explore the data in detail.</em></p>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="visualization-card" style="text-align: center;">
+            <p>Premier League Player Statistics Dashboard - Created with D3.js</p>
+        </footer>
     </div>
     
+    <!-- Load JavaScript libraries -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    
+    <!-- Load visualization scripts -->
+    <script src="team-comparison.js"></script>
     <script src="position-performance.js"></script>
     <script src="age-performance.js"></script>
 </body>
