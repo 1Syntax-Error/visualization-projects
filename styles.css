@@ -35,11 +35,14 @@ h1, h2, h3 {
 
 /* Visualization container */
 .visualization-card {
+    width: 100%;
+    max-width: 100%;
     background-color: white;
     padding: 20px;
     margin-bottom: 20px;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 /* Controls section */
@@ -342,11 +345,21 @@ select, button, input {
 }
 
 .parallel-coords-container {
-    flex-grow: 1;
+    width: 100%;
     background-color: #fafafa;
     border-radius: 5px;
     padding: 10px;
     box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+
+#parallel-coords {
+    width: 100%;
+    height: 600px;
+    max-width: 1400px; /* Set a reasonable max-width for very large screens */
 }
 
 .player-line {
@@ -361,14 +374,13 @@ select, button, input {
 
 .player-highlight {
     width: 100%;
-    max-width: 350px;
+    max-width: 100%;
     padding: 15px;
     background-color: #f8f8f8;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border-left: 4px solid #37003c;
-    max-height: 500px;
-    overflow-y: auto;
+    margin-top: 20px;
     transition: all 0.3s ease;
 }
 
@@ -380,6 +392,7 @@ select, button, input {
 }
 
 .comparison-controls {
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
@@ -387,38 +400,40 @@ select, button, input {
     background-color: #f5f5f5;
     padding: 12px;
     border-radius: 5px;
+    box-sizing: border-box;
 }
 
 .position-filter {
     display: flex;
     flex-direction: column;
-    gap: 8px;
 }
 
 .position-buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
-}
-
-.appearance-filter {
-    display: flex;
-    align-items: center;
     gap: 8px;
+    margin-top: 5px;
 }
 
-#min-games {
-    width: 150px;
-}
-
-#min-games-value {
-    background-color: #37003c;
+/* Position-specific button colors */
+.forward-btn {
+    background-color: #e90052;
     color: white;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-weight: bold;
-    min-width: 30px;
-    text-align: center;
+}
+
+.midfielder-btn {
+    background-color: #04f5ff;
+    color: black;
+}
+
+.defender-btn {
+    background-color: #00ff85;
+    color: black;
+}
+
+.goalkeeper-btn {
+    background-color: #ff9e00;
+    color: black;
 }
 
 .player-basic-info {
@@ -452,7 +467,7 @@ select, button, input {
 
 .player-stats {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
     margin-bottom: 15px;
 }
@@ -580,7 +595,19 @@ select, button, input {
     display: block;
 }
 
+/* Add hover effects to player rows */
+.player-table tr:hover {
+    background-color: #f0f8ff;
+    transition: background-color 0.2s;
+}
+
 /* Responsive adjustments */
+@media (max-width: 992px) {
+    .player-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
     .controls, .distribution-controls, .comparison-controls {
         flex-direction: column;
@@ -613,8 +640,8 @@ select, button, input {
         flex-wrap: wrap;
     }
     
-    .player-highlight {
-        max-width: 100%;
+    .player-stats {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -640,10 +667,8 @@ select, button, input {
     .player-stats {
         grid-template-columns: 1fr;
     }
-}
-
-/* Add hover effects to player rows */
-.player-table tr:hover {
-    background-color: #f0f8ff;
-    transition: background-color 0.2s;
+    
+    .position-buttons {
+        flex-direction: column;
+    }
 }

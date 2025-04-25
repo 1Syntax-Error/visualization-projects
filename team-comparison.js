@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function processData(rawData) {
-        // Clean data - convert percentage strings to numbers and filter incomplete entries
+        // converts percentage strings to numbers and filter incomplete entries
         const data = rawData.filter(player => player.Club && player.Position).map(player => {
             // Convert percentage strings to numbers
             Object.keys(player).forEach(key => {
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mainContainer.appendChild(heading);
         
         const description = document.createElement('p');
-        description.textContent = 'Compare teams based on their players\' collective statistics';
+        description.textContent = 'This Compares all the teams against each other based on their players performance and stats\' collective statistics';
         mainContainer.appendChild(description);
         
         // Create controls section
@@ -280,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
             .attr('font-size', '12px');
         
         // Create color scale based on Premier League team colors
-        // Using color names instead of hex codes for readability
         const teamColors = {
             'Arsenal': 'red',
             'Aston-Villa': 'skyblue',

@@ -53,6 +53,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update visualization based on selected position
             updateVisualizationByPosition(data, position);
         });
+        
+        // Window resize event to make the visualization responsive
+        window.addEventListener('resize', function() {
+            // Get currently selected position
+            const activePositionBtn = document.querySelector('.position-btn.active');
+            if (activePositionBtn) {
+                const position = activePositionBtn.getAttribute('data-position');
+                updateVisualizationByPosition(data, position);
+            }
+        });
     }
     
     function createMultidimensionalView(data) {
@@ -63,36 +73,28 @@ document.addEventListener('DOMContentLoaded', function() {
         // Set up container structure
         container.innerHTML = `
             <h2>Multidimensional Player Comparison</h2>
-            <p>Compare player performance across multiple metrics simultaneously</p>
+            <p>This shows a Comparison between player performances across multiple metrics simultaneously </p>
             
             <div class="comparison-controls">
                 <div class="position-filter">
                     <span>Position: </span>
                     <div class="position-buttons">
                         <button class="position-btn active" data-position="All">All Positions</button>
-                        <button class="position-btn" data-position="Forward">Forwards</button>
-                        <button class="position-btn" data-position="Midfielder">Midfielders</button>
-                        <button class="position-btn" data-position="Defender">Defenders</button>
-                        <button class="position-btn" data-position="Goalkeeper">Goalkeepers</button>
+                        <button class="position-btn forward-btn" data-position="Forward">Forwards</button>
+                        <button class="position-btn midfielder-btn" data-position="Midfielder">Midfielders</button>
+                        <button class="position-btn defender-btn" data-position="Defender">Defenders</button>
+                        <button class="position-btn goalkeeper-btn" data-position="Goalkeeper">Goalkeepers</button>
                     </div>
-                </div>
-                
-                <div class="appearance-filter">
-                    <label for="min-games">Min Games:</label>
-                    <input type="range" id="min-games" min="10" max="30" value="15" step="5">
-                    <span id="min-games-value">15</span>
                 </div>
             </div>
             
-            <div class="visualization-area">
-                <div class="parallel-coords-container">
-                    <svg id="parallel-coords" width="800" height="500"></svg>
-                </div>
-                
-                <div class="player-highlight" id="player-highlight">
-                    <h3>Selected Player</h3>
-                    <p>Select a player line to see details</p>
-                </div>
+            <div class="parallel-coords-container">
+                <svg id="parallel-coords"></svg>
+            </div>
+            
+            <div class="player-highlight" id="player-highlight">
+                <h3>Selected Player</h3>
+                <p>Select a player line to see details</p>
             </div>
         `;
         
@@ -109,21 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Set up appearance filter
-        const minGamesSlider = document.getElementById('min-games');
-        const minGamesValue = document.getElementById('min-games-value');
-        
-        minGamesSlider.addEventListener('input', function() {
-            minGamesValue.textContent = this.value;
-            
-            // Get currently selected position
-            const activePositionBtn = document.querySelector('.position-btn.active');
-            const position = activePositionBtn.getAttribute('data-position');
-            
-            // Update visualization
-            updateVisualizationByPosition(data, position, parseInt(this.value));
-        });
-        
         // Initialize visualization with all positions
         updateVisualizationByPosition(data, 'All', 15);
     }
@@ -138,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
             filteredData = data.filter(player => player.Position === position && player.Appearances >= minAppearances);
         }
         
-        // Get top 30 players by appearances (if we have more than 30)
+        // Get top 30 players by appearances
         let displayData = filteredData;
         if (filteredData.length > 30) {
             displayData = filteredData
@@ -154,15 +141,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear existing visualization
         d3.select("#parallel-coords").html("");
         
-        const margin = {top: 50, right: 50, bottom: 30, left: 50};
-        const width = 800 - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
+        // Get container dimensions
+        const container = document.querySelector('.parallel-coords-container');
+        const containerWidth = container.clientWidth;
         
-        // Create SVG
+        // Set SVG dimensions based on container
         const svg = d3.select("#parallel-coords")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
+            .attr("width", containerWidth)
+            .attr("height", 600);
+        
+        const margin = {top: 50, right: 50, bottom: 30, left: 50};
+        const width = containerWidth - margin.left - margin.right;
+        const height = 600 - margin.top - margin.bottom;
+        
+        // Append a group element to the SVG to respect margins
+        const g = svg.append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
         
         // Define dimensions to display
@@ -198,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .range(["#e90052", "#04f5ff", "#00ff85", "#ff9e00"]);
         
         // Add background lines for context
-        const background = svg.append("g")
+        const background = g.append("g")
             .attr("class", "background")
             .selectAll("path")
             .data(data)
@@ -211,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .style("opacity", 0.3);
         
         // Add foreground lines (one per player)
-        const foreground = svg.append("g")
+        const foreground = g.append("g")
             .attr("class", "foreground")
             .selectAll("path")
             .data(data)
@@ -243,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         
         // Add a group element for each dimension
-        const axes = svg.selectAll(".dimension")
+        const axes = g.selectAll(".dimension")
             .data(dimensions)
             .enter()
             .append("g")
@@ -264,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .style("fill", "black");
         
         // Add title
-        svg.append("text")
+        g.append("text")
             .attr("x", width / 2)
             .attr("y", -30)
             .attr("text-anchor", "middle")
@@ -272,30 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .style("font-weight", "bold")
             .text(`Player Performance Comparison (${data.length} players)`);
         
-        // Add legend
-        const legend = svg.append("g")
-            .attr("class", "legend")
-            .attr("transform", `translate(${width - 150}, -30)`);
-        
-        const positions = ["Forward", "Midfielder", "Defender", "Goalkeeper"];
-        
-        positions.forEach((pos, i) => {
-            const lg = legend.append("g")
-                .attr("transform", `translate(0, ${i * 20})`);
-            
-            lg.append("rect")
-                .attr("x", 0)
-                .attr("y", 0)
-                .attr("width", 12)
-                .attr("height", 12)
-                .attr("fill", colorScale(pos));
-            
-            lg.append("text")
-                .attr("x", 20)
-                .attr("y", 10)
-                .text(pos)
-                .style("font-size", "12px");
-        });
+        // No legend - using colored buttons instead
         
         // Helper function for drawing paths
         function path(d) {

@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Set up container structure
         container.innerHTML = `
             <h2>Performance Distribution Analysis</h2>
-            <p>Explore the distribution of key metrics across player positions and age groups</p>
+            <p>This shows the distribution of key statistics across player positions and age groups</p>
             
             <div class="distribution-controls">
                 <div class="metric-selector">
@@ -80,11 +80,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         <button class="view-btn" data-view="age">By Age Group</button>
                     </div>
                 </div>
-                
-                <div class="min-appearances-control">
-                    <label for="distribution-min-apps">Min. Appearances:</label>
-                    <input type="number" id="distribution-min-apps" min="5" max="30" value="10" step="5">
-                </div>
             </div>
             
             <div class="visualization-area">
@@ -102,9 +97,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('distribution-metric').addEventListener('change', function() {
             const activeViewBtn = document.querySelector('.view-btn.active');
             const view = activeViewBtn.getAttribute('data-view');
-            const minApps = parseInt(document.getElementById('distribution-min-apps').value);
             
-            updateDistributionPlot(data, this.value, view, minApps);
+            updateDistributionPlot(data, this.value, view);
         });
         
         document.querySelectorAll('.view-btn').forEach(button => {
@@ -116,38 +110,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update visualization
                 const view = this.getAttribute('data-view');
                 const metric = document.getElementById('distribution-metric').value;
-                const minApps = parseInt(document.getElementById('distribution-min-apps').value);
                 
-                updateDistributionPlot(data, metric, view, minApps);
+                updateDistributionPlot(data, metric, view);
             });
         });
         
-        document.getElementById('distribution-min-apps').addEventListener('change', function() {
-            const activeViewBtn = document.querySelector('.view-btn.active');
-            const view = activeViewBtn.getAttribute('data-view');
-            const metric = document.getElementById('distribution-metric').value;
-            const minApps = parseInt(this.value);
-            
-            updateDistributionPlot(data, metric, view, minApps);
-        });
-        
         // Initialize with default values
-        updateDistributionPlot(data, 'Goals', 'position', 10);
+        updateDistributionPlot(data, 'Goals', 'position');
     }
     
-    function updateDistributionPlot(data, metric, view, minAppearances) {
-        // Filter data by minimum appearances
-        const filteredData = data.filter(player => player.Appearances >= minAppearances);
-        
+    function updateDistributionPlot(data, metric, view) {
         // Determine which plot to create based on view
         if (view === 'position') {
-            createViolinPlot(filteredData, metric);
+            createViolinPlot(data, metric);
         } else if (view === 'age') {
-            createAgeGroupPlot(filteredData, metric);
+            createAgeGroupPlot(data, metric);
         }
         
         // Update insights
-        updateInsights(filteredData, metric, view);
+        updateInsights(data, metric, view);
     }
     
     function createViolinPlot(data, metric) {
@@ -573,23 +554,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
             });
             
-            // Add sample size
-            g.append("text")
-                .attr("x", x(group.group) + x.bandwidth() / 2)
-                .attr("y", height + 25)
-                .attr("text-anchor", "middle")
-                .attr("font-size", "10px")
-                .text(`n=${group.players.length}`);
+            // No sample size label
         });
     }
     
     function updateViolinPlot(data, position) {
         // Get current metric
         const metric = document.getElementById('distribution-metric').value;
-        const minApps = parseInt(document.getElementById('distribution-min-apps').value);
-        
-        // Filter data by minimum appearances
-        const filteredData = data.filter(player => player.Appearances >= minApps);
         
         // Set position button to active
         document.querySelectorAll('.view-btn').forEach(btn => {

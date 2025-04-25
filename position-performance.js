@@ -92,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('y-metric').addEventListener('change', () => updateVisualization(data));
         document.getElementById('size-metric').addEventListener('change', () => updateVisualization(data));
         document.getElementById('club-filter').addEventListener('change', () => updateVisualization(data));
-        document.getElementById('min-appearances').addEventListener('input', () => updateVisualization(data));
     }
     
     function createVisualization(data) {
@@ -106,7 +105,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const yMetric = document.getElementById('y-metric').value;
         const sizeMetric = document.getElementById('size-metric').value;
         const clubFilter = document.getElementById('club-filter').value;
-        const minAppearances = parseInt(document.getElementById('min-appearances').value) || 0;
         
         // Get selected positions
         const selectedPositions = Array.from(document.querySelectorAll('#position-checkboxes input:checked')).map(cb => cb.value);
@@ -115,7 +113,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let filteredData = data.filter(player => {
             return selectedPositions.includes(player.Position) && 
                    (clubFilter === 'All' || player.Club === clubFilter) &&
-                   player.Appearances >= minAppearances &&
                    player[xMetric] !== null && player[xMetric] !== undefined &&
                    player[yMetric] !== null && player[yMetric] !== undefined &&
                    player[sizeMetric] !== null && player[sizeMetric] !== undefined;

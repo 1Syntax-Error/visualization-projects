@@ -1,4 +1,4 @@
-// field-position-map.js - Interactive soccer field visualization showing position-specific statistics
+// Interactive soccer field visualization showing position-specific statistics
 document.addEventListener('DOMContentLoaded', function() {
     // Dataset URL
     const datasetUrl = 'https://raw.githubusercontent.com/1Syntax-Error/visualization-projects/main/dataset%20-%202020-09-24.csv';
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         container.innerHTML = `
             <h2>Player Performance by Position</h2>
-            <p>Explore how different positions contribute to key performance metrics across the pitch</p>
+            <p> This shows how different positions contributes to some key performance metrics across the soccer pitch </p>
             
             <div class="field-controls">
                 <div class="metric-selector">
