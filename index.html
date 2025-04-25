@@ -13,19 +13,42 @@
             <p>Explore and analyze player performance metrics across different positions and teams</p>
         </header>
         
-        <!-- Soccer Field Image Section -->
-        <div class="visualization-card">
-            <h2>Premier League Player Positions</h2>
-            <p>Soccer field showing the typical positions and roles of Premier League players</p>
-            
-            <div class="soccer-field-container">
-                <img src="Public/Soccer field.png" alt="Soccer Field Positions" class="soccer-field-image">
-            </div>
+        <!-- 1. Player Performance by Position -->
+        <div class="visualization-card" id="field-visualization">
+            <!-- This will be filled by field-position-map.js -->
         </div>
         
-        <!-- Team Comparison Dashboard Section -->
+        <!-- 2. Premier League Statistics on Tableau -->
+        <div class="visualization-card">
+            <h2>Premier League Statistics on Tableau</h2>
+            <p>Distribution of players by position, club, and appearances</p>
+            
+            <div class="tableau-container">
+                <!-- Single Tableau image containing both visualizations -->
+                <img src="Public/Tableau Pic.png" alt="Premier League Player Statistics" class="tableau-screenshot">
+                
+                <!-- Link to Tableau Public -->
+                <a href="https://public.tableau.com/app/profile/paul.gang.tangyie8402/viz/visualizationproject_17443953305650/Dashboard1" target="_blank" class="tableau-link">
+                    View Interactive Dashboard on Tableau Public
+                </a>
+            </div>
+            
+            <p><em>The interactive version of this dashboard is available on Tableau Public. Click the link above to explore the data in detail.</em></p>
+        </div>
+        
+        <!-- 3. Team Comparison Dashboard Section -->
         <div class="visualization-card" id="team-comparison-section">
             <!-- This section will be populated by the JavaScript -->
+        </div>
+        
+        <!-- 4. Performance Distribution Analysis -->
+        <div class="visualization-card" id="performance-distribution">
+            <!-- This will be filled by performance-distribution.js -->
+        </div>
+        
+        <!-- 5. Multidimensional Player Comparison -->
+        <div class="visualization-card" id="multidimensional-comparison">
+            <!-- This will be filled by multidimensional-comparison.js -->
         </div>
         
         <!-- Position Performance Scatter Plot Section -->
@@ -104,33 +127,10 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Age vs Performance Visualization Section -->
-        <div class="visualization-card" id="age-performance-section">
-            <!-- Age vs Performance visualization will be created here by the JavaScript -->
-        </div>
-        
-        <!-- Tableau Screenshot Section -->
-        <div class="visualization-card">
-            <h2>Premier League Statistics on Tableau</h2>
-            <p>Distribution of players by position, club, and appearances</p>
-            
-            <div class="tableau-container">
-                <!-- Single Tableau image containing both visualizations -->
-                <img src="Public/Tableau Pic.png" alt="Premier League Player Statistics" class="tableau-screenshot">
                 
-                <!-- Link to Tableau Public -->
-                <a href="https://public.tableau.com/app/profile/paul.gang.tangyie8402/viz/visualizationproject_17443953305650/Dashboard1" target="_blank" class="tableau-link">
-                    View Interactive Dashboard on Tableau Public
-                </a>
-            </div>
-            
-            <p><em>The interactive version of this dashboard is available on Tableau Public. Click the link above to explore the data in detail.</em></p>
-        </div>
-        
         <!-- Footer -->
         <footer class="visualization-card" style="text-align: center;">
-            <p>Premier League Player Statistics Dashboard - Created with D3.js</p>
+            <p> Premier League Player Statistics Dashboard </p>
         </footer>
     </div>
     
@@ -139,7 +139,10 @@
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
     
     <!-- Load visualization scripts -->
+    <script src="field-position-map.js"></script>
     <script src="team-comparison.js"></script>
+    <script src="performance-distribution.js"></script>
+    <script src="multidimensional-comparison.js"></script>
     <script src="position-performance.js"></script>
     <script src="age-performance.js"></script>
 </body>
