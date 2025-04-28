@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function processData(rawData) {
-        // Clean and filter data
+        // Clean and filter data - only filter out invalid players but include all appearances
         const data = rawData.filter(player => {
-            return player.Name && player.Position && player.Appearances >= 10;
+            return player.Name && player.Position; // Only basic validation, no minimum appearances filter
         }).map(player => {
             // Convert percentage strings to numbers
             Object.keys(player).forEach(key => {
@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             return player;
         });
+        
+        console.log(`Total players in dataset: ${data.length}`);
         
         // Set up the visualization
         createMultidimensionalView(data);
@@ -70,6 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('multidimensional-comparison');
         if (!container) return;
         
+        // Get total number of players for slider maximum
+        const totalPlayersCount = data.length;
+        
         // Set up container structure
         container.innerHTML = `
             <h2>Multidimensional Player Comparison</h2>
@@ -86,6 +91,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         <button class="position-btn goalkeeper-btn" data-position="Goalkeeper">Goalkeepers</button>
                     </div>
                 </div>
+                
+                <!-- Player count slider control -->
+                <div class="player-count-control">
+                    <span>Number of Players to Display: </span>
+                    <div class="slider-container">
+                        <input type="range" id="player-count-slider" min="10" max="${totalPlayersCount}" value="30" step="10">
+                        <span id="player-count-value">30</span> of ${totalPlayersCount} players
+                    </div>
+                    <div class="slider-labels">
+                        <span>10</span>
+                        <span>All Players (${totalPlayersCount})</span>
+                    </div>
+                </div>
             </div>
             
             <div class="parallel-coords-container">
@@ -98,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        // Set up event listeners
+        // Set up event listeners for position buttons
         document.querySelectorAll('.position-btn').forEach(button => {
             button.addEventListener('click', function() {
                 // Update active button
@@ -111,33 +129,79 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Initialize visualization with all positions
-        updateVisualizationByPosition(data, 'All', 15);
+        // Set up player count slider
+        const playerCountSlider = document.getElementById('player-count-slider');
+        const playerCountValue = document.getElementById('player-count-value');
+        
+        playerCountSlider.addEventListener('input', function() {
+            playerCountValue.textContent = this.value;
+        });
+        
+        playerCountSlider.addEventListener('change', function() {
+            // Get currently selected position
+            const activePositionBtn = document.querySelector('.position-btn.active');
+            if (activePositionBtn) {
+                const position = activePositionBtn.getAttribute('data-position');
+                updateVisualizationByPosition(data, position);
+            }
+        });
+        
+        // Initialize visualization with all positions and default player count
+        updateVisualizationByPosition(data, 'All');
     }
     
-    function updateVisualizationByPosition(data, position, minAppearances = 15) {
-        // Filter data by position and appearances
+    function updateVisualizationByPosition(data, position) {
+        // Get slider value for player count
+        const playerCountSlider = document.getElementById('player-count-slider');
+        const maxPlayers = parseInt(playerCountSlider.value);
+        
+        // Filter data by position only (no minimum appearances filter)
         let filteredData;
         
         if (position === 'All') {
-            filteredData = data.filter(player => player.Appearances >= minAppearances);
+            filteredData = data;
         } else {
-            filteredData = data.filter(player => player.Position === position && player.Appearances >= minAppearances);
+            filteredData = data.filter(player => player.Position === position);
         }
         
-        // Get top 30 players by appearances
+        // Sort by appearances (high to low) so most active players show first
+        filteredData = filteredData.sort((a, b) => (b.Appearances || 0) - (a.Appearances || 0));
+        
+        // Get top N players based on slider
         let displayData = filteredData;
-        if (filteredData.length > 30) {
-            displayData = filteredData
-                .sort((a, b) => b.Appearances - a.Appearances)
-                .slice(0, 30);
+        if (filteredData.length > maxPlayers) {
+            displayData = filteredData.slice(0, maxPlayers);
         }
         
         // Create parallel coordinates visualization
-        createParallelCoordinates(displayData);
+        createParallelCoordinates(displayData, filteredData.length);
+        
+        // Update player count slider max value based on filtered data
+        if (position !== 'All') {
+            // Only change the max if position is selected
+            const positionCount = data.filter(p => p.Position === position).length;
+            
+            playerCountSlider.max = positionCount;
+            document.querySelector('.slider-labels span:last-child').textContent = 
+                `All ${position}s (${positionCount})`;
+                
+            // If current value is greater than new max, adjust it
+            if (parseInt(playerCountSlider.value) > positionCount) {
+                playerCountSlider.value = positionCount;
+                document.getElementById('player-count-value').textContent = positionCount;
+            }
+        } else {
+            // For "All Positions", set to total dataset size
+            playerCountSlider.max = data.length;
+            document.querySelector('.slider-labels span:last-child').textContent = 
+                `All Players (${data.length})`;
+        }
+        
+        // Update display count in slider label
+        document.querySelector('#player-count-value').nextSibling.textContent = ` of ${filteredData.length} players`;
     }
     
-    function createParallelCoordinates(data) {
+    function createParallelCoordinates(data, totalAvailable) {
         // Clear existing visualization
         d3.select("#parallel-coords").html("");
         
@@ -256,16 +320,18 @@ document.addEventListener('DOMContentLoaded', function() {
             .text(d => d)
             .style("fill", "black");
         
-        // Add title
+        // Add title with player count and total available
+        const displayText = totalAvailable ? 
+            `Player Performance Comparison (${data.length} of ${totalAvailable} players)` :
+            `Player Performance Comparison (${data.length} players)`;
+            
         g.append("text")
             .attr("x", width / 2)
             .attr("y", -30)
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("font-weight", "bold")
-            .text(`Player Performance Comparison (${data.length} players)`);
-        
-        // No legend - using colored buttons instead
+            .text(displayText);
         
         // Helper function for drawing paths
         function path(d) {
@@ -297,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="player-stats">
                 <div class="stat-item">
                     <span class="stat-label">Appearances:</span>
-                    <span class="stat-value">${player.Appearances}</span>
+                    <span class="stat-value">${player.Appearances || 0}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Goals:</span>
@@ -317,11 +383,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Wins:</span>
-                    <span class="stat-value">${player.Wins}</span>
+                    <span class="stat-value">${player.Wins || 0}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Losses:</span>
-                    <span class="stat-value">${player.Losses}</span>
+                    <span class="stat-value">${player.Losses || 0}</span>
                 </div>
             </div>
         `;
