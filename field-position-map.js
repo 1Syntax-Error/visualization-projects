@@ -44,16 +44,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         container.innerHTML = `
             <h2>Player Performance by Position</h2>
-            <p> This shows how different positions contributes to some key performance metrics across the soccer pitch </p>
+            <p>This shows how different positions contributes to some key performance metrics across the soccer pitch</p>
             
             <div class="field-controls">
                 <div class="metric-selector">
                     <label>Performance Metric:</label>
                     <div class="button-group">
+                        <!-- First row of metrics -->
                         <button class="metric-btn active" data-metric="Goals">Goals</button>
                         <button class="metric-btn" data-metric="Assists">Assists</button>
                         <button class="metric-btn" data-metric="Passes">Passes</button>
                         <button class="metric-btn" data-metric="Tackles">Tackles</button>
+                        <button class="metric-btn" data-metric="Interceptions">Interceptions</button>
+                        <button class="metric-btn" data-metric="Clearances">Clearances</button>
+                        <button class="metric-btn" data-metric="Yellow cards">Yellow Cards</button>
+                        <button class="metric-btn" data-metric="Red cards">Red Cards</button>
                     </div>
                 </div>
             </div>
