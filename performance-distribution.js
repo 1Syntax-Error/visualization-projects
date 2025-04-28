@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Set up container structure
         container.innerHTML = `
-            <h2>Performance Distribution Analysis</h2>
+            <h2>Performance Distribution Analysis (Violin Plot and Box Plot) </h2>
             <p>This shows the distribution of key statistics across player positions and age groups</p>
             
             <div class="distribution-controls">

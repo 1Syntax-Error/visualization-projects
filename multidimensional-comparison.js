@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Set up container structure
         container.innerHTML = `
-            <h2>Multidimensional Player Comparison</h2>
+            <h2>Multidimensional Player Comparison (Parallel Coordinates Plot) </h2>
             <p>This shows a Comparison between player performances across multiple metrics simultaneously </p>
             
             <div class="comparison-controls">

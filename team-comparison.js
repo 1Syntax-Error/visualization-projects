@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
         // Create heading
         const heading = document.createElement('h2');
-        heading.textContent = 'Team Comparison Dashboard';
+        heading.textContent = 'Team Comparison Dashboard (Horizontal Bar Chart)';
         mainContainer.appendChild(heading);
         
         const description = document.createElement('p');

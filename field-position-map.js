@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!container) return;
         
         container.innerHTML = `
-            <h2>Player Performance by Position</h2>
+            <h2>Player Performance by Position (Soccer Field Bubble Chart)</h2>
             <p>This shows how different positions contributes to some key performance metrics across the soccer pitch</p>
             
             <div class="field-controls">
