@@ -1,4 +1,4 @@
-// performance-distribution.js - Analyze the distribution of performance metrics across different dimensions
+// performance distribution which analyze the distribution of performance metrics across different dimensions
 document.addEventListener('DOMContentLoaded', function() {
     // Dataset URL
     const datasetUrl = 'https://raw.githubusercontent.com/1Syntax-Error/visualization-projects/main/dataset%20-%202020-09-24.csv';

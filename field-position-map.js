@@ -1,4 +1,4 @@
-// Interactive soccer field visualization showing position-specific statistics
+// Soccer field visualization showing position-specific statistics
 document.addEventListener('DOMContentLoaded', function() {
     // Dataset URL
     const datasetUrl = 'https://raw.githubusercontent.com/1Syntax-Error/visualization-projects/main/dataset%20-%202020-09-24.csv';
@@ -90,10 +90,10 @@ document.addEventListener('DOMContentLoaded', function() {
             { id: "rf", name: "Right Forward", x: 500, y: 150, players: data.filter(p => p.Position === "Forward") }
         ];
         
-        // Add position markers
+        // Position markers
         drawPositionMarkers(positions, "Goals");
         
-        // Add event listeners for metric buttons
+        // Event listeners for metric buttons
         document.querySelectorAll('.metric-btn').forEach(button => {
             button.addEventListener('click', function() {
                 // Update active button

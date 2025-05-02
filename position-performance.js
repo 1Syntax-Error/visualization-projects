@@ -1,4 +1,4 @@
-// Main visualization code for Premier League Player Statistics
+// Main visualization code for Premier League Player Statistics based on position
 document.addEventListener('DOMContentLoaded', function() {
     // Dataset URL (direct link to raw file)
     const datasetUrl = 'https://raw.githubusercontent.com/1Syntax-Error/visualization-projects/main/dataset%20-%202020-09-24.csv';

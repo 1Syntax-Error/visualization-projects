@@ -1,4 +1,4 @@
-// multidimensional-comparison.js - Compare players across multiple metrics simultaneously
+// multidimensional-comparison which Compare players across multiple metrics simultaneously
 document.addEventListener('DOMContentLoaded', function() {
     // Dataset URL
     const datasetUrl = 'https://raw.githubusercontent.com/1Syntax-Error/visualization-projects/main/dataset%20-%202020-09-24.csv';
